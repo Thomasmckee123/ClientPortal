@@ -1,0 +1,41 @@
+# =========================
+# Node / Frontend
+# =========================
+client/node_modules/
+client/dist/
+client/.env
+client/.env.local
+client/.env.*.local
+
+# =========================
+# .NET / Backend
+# =========================
+server/bin/
+server/obj/
+server/.vs/
+*.user
+*.suo
+*.cache
+*.log
+
+# =========================
+# IDE
+# =========================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Environment
+# =========================
+*.env
+.env.local
+.env.*.local
