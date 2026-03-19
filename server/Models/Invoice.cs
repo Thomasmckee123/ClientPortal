@@ -23,7 +23,7 @@ public class Invoice
     public decimal TaxAmount { get; set; }
     public decimal Total { get; set; }
 
-    public string Status { get; set; } = "Draft"; // Draft, Sent, Paid, Overdue
+    public string Status { get; set; } = "Draft";
     public string? Notes { get; set; }
 }
 

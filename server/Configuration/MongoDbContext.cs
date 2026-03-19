@@ -16,4 +16,7 @@ public class MongoDbContext
 
     public IMongoCollection<Invoice> Invoices => _database.GetCollection<Invoice>("Invoices");
     public IMongoCollection<Receipt> Receipts => _database.GetCollection<Receipt>("Receipts");
+    public IMongoCollection<User> Users => _database.GetCollection<User>("Users");
+    public IMongoCollection<Client> Clients => _database.GetCollection<Client>("Clients");
+    public IMongoCollection<Account> Accounts => _database.GetCollection<Account>("Accounts");
 }

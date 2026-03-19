@@ -1,3 +1,4 @@
+using ClientPortal.API.DTOs;
 using ClientPortal.API.Models;
 using ClientPortal.API.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -27,19 +28,61 @@ public class InvoicesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Invoice>> Create(Invoice invoice)
+    public async Task<ActionResult<Invoice>> Create(CreateInvoiceDto dto)
     {
+        var invoice = new Invoice
+        {
+            InvoiceNumber = dto.InvoiceNumber,
+            DueDate = dto.DueDate,
+            ClientName = dto.ClientName,
+            ClientEmail = dto.ClientEmail,
+            TaxRate = dto.TaxRate,
+            Notes = dto.Notes,
+            LineItems = dto.LineItems.Select(li => new LineItem
+            {
+                Description = li.Description,
+                Quantity = li.Quantity,
+                UnitPrice = li.UnitPrice,
+                Amount = li.Quantity * li.UnitPrice
+            }).ToList()
+        };
+        invoice.Subtotal = invoice.LineItems.Sum(li => li.Amount);
+        invoice.TaxAmount = invoice.Subtotal * invoice.TaxRate / 100;
+        invoice.Total = invoice.Subtotal + invoice.TaxAmount;
+
         var created = await _invoiceService.CreateAsync(invoice);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(string id, Invoice invoice)
+    public async Task<IActionResult> Update(string id, UpdateInvoiceDto dto)
     {
         var existing = await _invoiceService.GetByIdAsync(id);
         if (existing is null) return NotFound();
 
-        invoice.Id = id;
+        var invoice = new Invoice
+        {
+            Id = id,
+            InvoiceNumber = dto.InvoiceNumber,
+            CreatedDate = existing.CreatedDate,
+            DueDate = dto.DueDate,
+            ClientName = dto.ClientName,
+            ClientEmail = dto.ClientEmail,
+            TaxRate = dto.TaxRate,
+            Status = dto.Status,
+            Notes = dto.Notes,
+            LineItems = dto.LineItems.Select(li => new LineItem
+            {
+                Description = li.Description,
+                Quantity = li.Quantity,
+                UnitPrice = li.UnitPrice,
+                Amount = li.Quantity * li.UnitPrice
+            }).ToList()
+        };
+        invoice.Subtotal = invoice.LineItems.Sum(li => li.Amount);
+        invoice.TaxAmount = invoice.Subtotal * invoice.TaxRate / 100;
+        invoice.Total = invoice.Subtotal + invoice.TaxAmount;
+
         await _invoiceService.UpdateAsync(id, invoice);
         return NoContent();
     }

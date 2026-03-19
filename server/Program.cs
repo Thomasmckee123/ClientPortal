@@ -11,6 +11,9 @@ builder.Services.AddSingleton<MongoDbContext>();
 // Services
 builder.Services.AddScoped<InvoiceService>();
 builder.Services.AddScoped<ReceiptService>();
+builder.Services.AddScoped<ClientService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<AccountService>();
 
 // Controllers + Swagger
 builder.Services.AddControllers();
@@ -27,7 +30,6 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

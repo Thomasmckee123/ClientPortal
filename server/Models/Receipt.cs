@@ -15,7 +15,7 @@ public class Receipt
     public string ClientName { get; set; } = null!;
     public string ClientEmail { get; set; } = null!;
 
-    public string PaymentMethod { get; set; } = null!; // Cash, Card, Transfer, etc.
+    public string PaymentMethod { get; set; } = null!;
     public string? TransactionId { get; set; }
 
     public List<ReceiptItem> Items { get; set; } = new();
@@ -26,7 +26,7 @@ public class Receipt
     public decimal Total { get; set; }
 
     public string? Notes { get; set; }
-    public string? InvoiceId { get; set; } // Optional link to an invoice
+    public string? InvoiceId { get; set; }
 }
 
 public class ReceiptItem

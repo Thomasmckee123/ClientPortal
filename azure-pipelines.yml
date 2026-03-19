@@ -1,0 +1,54 @@
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+stages:
+  - stage: Build
+    displayName: 'Build'
+    jobs:
+      - job: BuildAPI
+        displayName: 'Build .NET API'
+        steps:
+          - task: UseDotNet@2
+            inputs:
+              packageType: 'sdk'
+              version: '8.x'
+
+          - script: dotnet restore server/ClientPortal.API.csproj
+            displayName: 'Restore NuGet packages'
+
+          - script: dotnet build server/ClientPortal.API.csproj --configuration $(buildConfiguration) --no-restore
+            displayName: 'Build API'
+
+          - script: dotnet publish server/ClientPortal.API.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/api --no-build
+            displayName: 'Publish API'
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/api'
+              ArtifactName: 'api'
+            displayName: 'Upload API artifact'
+
+      - job: BuildClient
+        displayName: 'Build React Client'
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '20.x'
+
+          - script: |
+              cd client
+              npm ci
+              npm run build
+            displayName: 'Install & Build Client'
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: 'client/dist'
+              ArtifactName: 'client'
+            displayName: 'Upload Client artifact'
