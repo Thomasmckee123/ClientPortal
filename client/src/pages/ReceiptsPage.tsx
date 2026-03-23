@@ -1,12 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api';
 import type { Receipt } from '../types';
+import Select from '../components/Select/Select';
 
 export default function ReceiptsPage() {
-  const [receipts, setReceipts] = useState<Receipt[]>([]);
+  const queryClient = useQueryClient();
+  const { data: receipts = [] } = useQuery({ queryKey: ['receipts'], queryFn: api.receipts.getAll });
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Receipt | null>(null);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    receiptNumber: string;
+    clientName: string;
+    clientEmail: string;
+    paymentMethod: string;
+    transactionId: string;
+    taxRate: number;
+    notes: string;
+    invoiceId: string;
+    items: { description: string; quantity: number; unitPrice: number }[];
+  }>({
     receiptNumber: '',
     clientName: '',
     clientEmail: '',
@@ -18,12 +31,7 @@ export default function ReceiptsPage() {
     items: [{ description: '', quantity: 1, unitPrice: 0 }],
   });
 
-  const load = async () => {
-    const data = await api.receipts.getAll();
-    setReceipts(data);
-  };
-
-  useEffect(() => { load(); }, []);
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['receipts'] });
 
   const resetForm = () => {
     setForm({ receiptNumber: '', clientName: '', clientEmail: '', paymentMethod: 'Cash', transactionId: '', taxRate: 0, notes: '', invoiceId: '', items: [{ description: '', quantity: 1, unitPrice: 0 }] });
@@ -40,7 +48,7 @@ export default function ReceiptsPage() {
       await api.receipts.create(data);
     }
     resetForm();
-    load();
+    invalidate();
   };
 
   const handleEdit = (r: Receipt) => {
@@ -62,7 +70,7 @@ export default function ReceiptsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this receipt?')) return;
     await api.receipts.delete(id);
-    load();
+    invalidate();
   };
 
   const addItem = () => {
@@ -95,12 +103,11 @@ export default function ReceiptsPage() {
             <input placeholder="Receipt Number" value={form.receiptNumber} onChange={e => setForm({ ...form, receiptNumber: e.target.value })} className="border rounded px-3 py-2" required />
             <input placeholder="Client Name" value={form.clientName} onChange={e => setForm({ ...form, clientName: e.target.value })} className="border rounded px-3 py-2" required />
             <input placeholder="Client Email" type="email" value={form.clientEmail} onChange={e => setForm({ ...form, clientEmail: e.target.value })} className="border rounded px-3 py-2" required />
-            <select value={form.paymentMethod} onChange={e => setForm({ ...form, paymentMethod: e.target.value })} className="border rounded px-3 py-2">
-              <option>Cash</option>
-              <option>Card</option>
-              <option>Transfer</option>
-              <option>Cheque</option>
-            </select>
+            <Select
+              value={form.paymentMethod}
+              onChange={e => setForm({ ...form, paymentMethod: e.target.value })}
+              options={['Cash', 'Card', 'Transfer', 'Cheque']}
+            />
             <input placeholder="Transaction ID (optional)" value={form.transactionId} onChange={e => setForm({ ...form, transactionId: e.target.value })} className="border rounded px-3 py-2" />
             <input placeholder="Tax Rate (%)" type="number" step="0.01" value={form.taxRate} onChange={e => setForm({ ...form, taxRate: parseFloat(e.target.value) || 0 })} className="border rounded px-3 py-2" />
             <input placeholder="Invoice ID (optional)" value={form.invoiceId} onChange={e => setForm({ ...form, invoiceId: e.target.value })} className="border rounded px-3 py-2" />
@@ -123,6 +130,19 @@ export default function ReceiptsPage() {
               </div>
             ))}
           </div>
+
+          {(() => {
+            const subtotal = form.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+            const taxAmount = subtotal * form.taxRate / 100;
+            const total = subtotal + taxAmount;
+            return (
+              <div className="bg-gray-50 rounded-lg p-4 space-y-1 text-sm">
+                <div className="flex justify-between"><span className="text-gray-600">Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
+                {form.taxRate > 0 && <div className="flex justify-between"><span className="text-gray-600">Tax ({form.taxRate}%)</span><span>${taxAmount.toFixed(2)}</span></div>}
+                <div className="flex justify-between font-semibold text-base border-t pt-2 mt-2"><span>Total</span><span>${total.toFixed(2)}</span></div>
+              </div>
+            );
+          })()}
 
           <div className="flex gap-2">
             <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">{editing ? 'Update' : 'Create'}</button>

@@ -1,3 +1,5 @@
+import type { Portal, TaskItem, Message, FileRecord, Invoice } from './types';
+
 const BASE = '/api';
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
@@ -12,9 +14,10 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
 
 export const api = {
   invoices: {
-    getAll: () => request<any[]>('/invoices'),
-    getById: (id: string) => request<any>(`/invoices/${id}`),
-    create: (data: any) => request<any>('/invoices', { method: 'POST', body: JSON.stringify(data) }),
+    getAll: () => request<Invoice[]>('/invoices'),
+    getById: (id: string) => request<Invoice>(`/invoices/${id}`),
+    getByPortalId: (portalId: string) => request<Invoice[]>(`/invoices/portal/${portalId}`),
+    create: (data: any) => request<Invoice>('/invoices', { method: 'POST', body: JSON.stringify(data) }),
     update: (id: string, data: any) => request<void>(`/invoices/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     delete: (id: string) => request<void>(`/invoices/${id}`, { method: 'DELETE' }),
   },
@@ -45,5 +48,28 @@ export const api = {
     create: (data: any) => request<any>('/accounts', { method: 'POST', body: JSON.stringify(data) }),
     update: (id: string, data: any) => request<void>(`/accounts/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     delete: (id: string) => request<void>(`/accounts/${id}`, { method: 'DELETE' }),
+  },
+  portals: {
+    getAll: () => request<Portal[]>('/portals'),
+    getById: (id: string) => request<Portal>(`/portals/${id}`),
+    getBySlug: (slug: string) => request<Portal>(`/portals/slug/${slug}`),
+    create: (data: any) => request<Portal>('/portals', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: string, data: any) => request<void>(`/portals/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    delete: (id: string) => request<void>(`/portals/${id}`, { method: 'DELETE' }),
+  },
+  tasks: {
+    getByPortalId: (portalId: string) => request<TaskItem[]>(`/tasks/portal/${portalId}`),
+    create: (data: any) => request<TaskItem>('/tasks', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: string, data: any) => request<void>(`/tasks/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    delete: (id: string) => request<void>(`/tasks/${id}`, { method: 'DELETE' }),
+  },
+  messages: {
+    getByPortalId: (portalId: string) => request<Message[]>(`/messages/portal/${portalId}`),
+    create: (data: any) => request<Message>('/messages', { method: 'POST', body: JSON.stringify(data) }),
+  },
+  files: {
+    getByPortalId: (portalId: string) => request<FileRecord[]>(`/files/portal/${portalId}`),
+    create: (data: any) => request<FileRecord>('/files', { method: 'POST', body: JSON.stringify(data) }),
+    delete: (id: string) => request<void>(`/files/${id}`, { method: 'DELETE' }),
   },
 };

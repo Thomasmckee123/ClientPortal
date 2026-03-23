@@ -19,4 +19,8 @@ public class MongoDbContext
     public IMongoCollection<User> Users => _database.GetCollection<User>("Users");
     public IMongoCollection<Client> Clients => _database.GetCollection<Client>("Clients");
     public IMongoCollection<Account> Accounts => _database.GetCollection<Account>("Accounts");
+    public IMongoCollection<Portal> Portals => _database.GetCollection<Portal>("Portals");
+    public IMongoCollection<TaskItem> Tasks => _database.GetCollection<TaskItem>("Tasks");
+    public IMongoCollection<Message> Messages => _database.GetCollection<Message>("Messages");
+    public IMongoCollection<FileRecord> Files => _database.GetCollection<FileRecord>("Files");
 }

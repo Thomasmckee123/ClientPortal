@@ -14,6 +14,10 @@ builder.Services.AddScoped<ReceiptService>();
 builder.Services.AddScoped<ClientService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AccountService>();
+builder.Services.AddScoped<PortalService>();
+builder.Services.AddScoped<TaskItemService>();
+builder.Services.AddScoped<MessageService>();
+builder.Services.AddScoped<FileRecordService>();
 
 // Controllers + Swagger
 builder.Services.AddControllers();

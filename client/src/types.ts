@@ -12,6 +12,7 @@ export interface Invoice {
   total: number;
   status: string;
   notes?: string;
+  portalId?: string;
 }
 
 export interface LineItem {
@@ -63,4 +64,44 @@ export interface User {
 export interface Account {
   id?: string;
   accountType: string;
+}
+
+export interface Portal {
+  id?: string;
+  name: string;
+  slug: string;
+  clientName: string;
+  clientEmail: string;
+  ownerId: string;
+  brandColor?: string;
+  logoUrl?: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface TaskItem {
+  id?: string;
+  title: string;
+  status: 'todo' | 'in_progress' | 'done';
+  portalId: string;
+  createdAt: string;
+}
+
+export interface Message {
+  id?: string;
+  body: string;
+  senderName: string;
+  senderRole: 'owner' | 'client';
+  portalId: string;
+  createdAt: string;
+}
+
+export interface FileRecord {
+  id?: string;
+  fileName: string;
+  fileSize: number;
+  contentType: string;
+  storagePath: string;
+  portalId: string;
+  uploadedAt: string;
 }

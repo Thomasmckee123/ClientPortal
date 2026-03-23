@@ -1,12 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api';
 import type { Invoice } from '../types';
+import Select from '../components/Select/Select';
 
 export default function InvoicesPage() {
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const queryClient = useQueryClient();
+  const { data: invoices = [] } = useQuery({ queryKey: ['invoices'], queryFn: api.invoices.getAll });
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Invoice | null>(null);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    invoiceNumber: string;
+    dueDate: string;
+    clientName: string;
+    clientEmail: string;
+    taxRate: number;
+    notes: string;
+    status: string;
+    lineItems: { description: string; quantity: number; unitPrice: number }[];
+  }>({
     invoiceNumber: '',
     dueDate: '',
     clientName: '',
@@ -17,12 +29,7 @@ export default function InvoicesPage() {
     lineItems: [{ description: '', quantity: 1, unitPrice: 0 }],
   });
 
-  const load = async () => {
-    const data = await api.invoices.getAll();
-    setInvoices(data);
-  };
-
-  useEffect(() => { load(); }, []);
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['invoices'] });
 
   const resetForm = () => {
     setForm({ invoiceNumber: '', dueDate: '', clientName: '', clientEmail: '', taxRate: 0, notes: '', status: 'Draft', lineItems: [{ description: '', quantity: 1, unitPrice: 0 }] });
@@ -39,7 +46,7 @@ export default function InvoicesPage() {
       await api.invoices.create(createData);
     }
     resetForm();
-    load();
+    invalidate();
   };
 
   const handleEdit = (inv: Invoice) => {
@@ -60,7 +67,7 @@ export default function InvoicesPage() {
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this invoice?')) return;
     await api.invoices.delete(id);
-    load();
+    invalidate();
   };
 
   const addLineItem = () => {
@@ -96,12 +103,11 @@ export default function InvoicesPage() {
             <input placeholder="Client Email" type="email" value={form.clientEmail} onChange={e => setForm({ ...form, clientEmail: e.target.value })} className="border rounded px-3 py-2" required />
             <input placeholder="Tax Rate (%)" type="number" step="0.01" value={form.taxRate} onChange={e => setForm({ ...form, taxRate: parseFloat(e.target.value) || 0 })} className="border rounded px-3 py-2" />
             {editing && (
-              <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} className="border rounded px-3 py-2">
-                <option>Draft</option>
-                <option>Sent</option>
-                <option>Paid</option>
-                <option>Overdue</option>
-              </select>
+              <Select
+                value={form.status}
+                onChange={e => setForm({ ...form, status: e.target.value })}
+                options={['Draft', 'Sent', 'Paid', 'Overdue']}
+              />
             )}
           </div>
           <input placeholder="Notes" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} className="border rounded px-3 py-2 w-full" />
@@ -122,6 +128,19 @@ export default function InvoicesPage() {
               </div>
             ))}
           </div>
+
+          {(() => {
+            const subtotal = form.lineItems.reduce((sum, li) => sum + li.quantity * li.unitPrice, 0);
+            const taxAmount = subtotal * form.taxRate / 100;
+            const total = subtotal + taxAmount;
+            return (
+              <div className="bg-gray-50 rounded-lg p-4 space-y-1 text-sm">
+                <div className="flex justify-between"><span className="text-gray-600">Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
+                {form.taxRate > 0 && <div className="flex justify-between"><span className="text-gray-600">Tax ({form.taxRate}%)</span><span>${taxAmount.toFixed(2)}</span></div>}
+                <div className="flex justify-between font-semibold text-base border-t pt-2 mt-2"><span>Total</span><span>${total.toFixed(2)}</span></div>
+              </div>
+            );
+          })()}
 
           <div className="flex gap-2">
             <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">{editing ? 'Update' : 'Create'}</button>

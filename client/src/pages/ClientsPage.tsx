@@ -1,19 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api';
 import type { Client } from '../types';
 
 export default function ClientsPage() {
-  const [clients, setClients] = useState<Client[]>([]);
+  const queryClient = useQueryClient();
+  const { data: clients = [] } = useQuery({ queryKey: ['clients'], queryFn: api.clients.getAll });
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Client | null>(null);
   const [form, setForm] = useState({ userId: 0, name: '', balance: 0, userTypeId: 0 });
 
-  const load = async () => {
-    const data = await api.clients.getAll();
-    setClients(data);
-  };
-
-  useEffect(() => { load(); }, []);
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['clients'] });
 
   const resetForm = () => {
     setForm({ userId: 0, name: '', balance: 0, userTypeId: 0 });
@@ -29,7 +26,7 @@ export default function ClientsPage() {
       await api.clients.create(form);
     }
     resetForm();
-    load();
+    invalidate();
   };
 
   const handleEdit = (c: Client) => {
@@ -41,7 +38,7 @@ export default function ClientsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this client?')) return;
     await api.clients.delete(id);
-    load();
+    invalidate();
   };
 
   return (

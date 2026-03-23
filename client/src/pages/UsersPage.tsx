@@ -1,19 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api';
 import type { User } from '../types';
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
+  const queryClient = useQueryClient();
+  const { data: users = [] } = useQuery({ queryKey: ['users'], queryFn: api.users.getAll });
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<User | null>(null);
   const [form, setForm] = useState({ email: '', accountId: 0, password: '' });
 
-  const load = async () => {
-    const data = await api.users.getAll();
-    setUsers(data);
-  };
-
-  useEffect(() => { load(); }, []);
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['users'] });
 
   const resetForm = () => {
     setForm({ email: '', accountId: 0, password: '' });
@@ -29,7 +26,7 @@ export default function UsersPage() {
       await api.users.create(form);
     }
     resetForm();
-    load();
+    invalidate();
   };
 
   const handleEdit = (u: User) => {
@@ -41,7 +38,7 @@ export default function UsersPage() {
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this user?')) return;
     await api.users.delete(id);
-    load();
+    invalidate();
   };
 
   return (
