@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import Select from '../components/Select/Select';
+import Button from '../components/Button/Button';
+import Input from '../components/Input/Input';
+import { useAuth } from '../context/AuthContext';
 
 export default function DashboardSettings() {
+  const { user } = useAuth();
   const [form, setForm] = useState({
-    name: 'Owner Name',
-    email: 'owner@example.com',
+    name: user?.name || 'Owner Name',
+    email: user?.email || 'owner@example.com',
     company: '',
     timezone: 'Europe/London',
   });
@@ -33,40 +37,31 @@ export default function DashboardSettings() {
         <h2 className="text-lg font-semibold text-gray-900">Profile</h2>
 
         <div className="space-y-4">
+          <Input
+            id="settings-name"
+            label="Full Name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className="w-full"
+          />
+          <Input
+            id="settings-email"
+            label="Email"
+            type="email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            className="w-full"
+          />
+          <Input
+            id="settings-company"
+            label="Company / Business Name"
+            value={form.company}
+            onChange={(e) => setForm({ ...form, company: e.target.value })}
+            placeholder="Your Business Ltd"
+            className="w-full"
+          />
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Full Name
-            </label>
-            <input
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Company / Business Name
-            </label>
-            <input
-              value={form.company}
-              onChange={(e) => setForm({ ...form, company: e.target.value })}
-              placeholder="Your Business Ltd"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="settings-timezone" className="block text-sm font-medium text-gray-700 mb-1">
               Timezone
             </label>
             <Select
@@ -84,12 +79,9 @@ export default function DashboardSettings() {
         </div>
 
         <div className="flex items-center gap-4">
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-          >
+          <Button type="submit">
             Save Changes
-          </button>
+          </Button>
           {saved && (
             <span className="text-sm text-green-600 font-medium">
               Settings saved!
@@ -103,9 +95,9 @@ export default function DashboardSettings() {
         <p className="text-sm text-gray-500">
           Permanently delete your account and all associated data.
         </p>
-        <button className="border border-red-300 text-red-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors">
+        <Button variant="danger">
           Delete Account
-        </button>
+        </Button>
       </div>
     </div>
   );

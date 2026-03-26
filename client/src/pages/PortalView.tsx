@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api';
+import { useAuth } from '../context/AuthContext';
+import Button from '../components/Button/Button';
+import Input from '../components/Input/Input';
 import type { Portal, TaskItem, Message, FileRecord, Invoice } from '../types';
 
 type Tab = 'overview' | 'files' | 'tasks' | 'messages' | 'invoices';
@@ -46,7 +49,10 @@ export default function PortalView() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-400">Loading portal...</p>
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-gray-400 mt-3">Loading portal...</p>
+        </div>
       </div>
     );
   }
@@ -58,12 +64,13 @@ export default function PortalView() {
           <h2 className="text-xl font-semibold text-gray-900">
             Portal not found
           </h2>
-          <button
+          <Button
+            variant="ghost"
             onClick={() => navigate('/dashboard')}
-            className="mt-4 text-blue-600 hover:underline text-sm"
+            className="mt-4 text-indigo-600 hover:underline text-sm"
           >
             Back to Dashboard
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -82,17 +89,18 @@ export default function PortalView() {
       {/* Header */}
       <div
         className="h-2"
-        style={{ backgroundColor: portal.brandColor || '#3B82F6' }}
+        style={{ backgroundColor: portal.brandColor || '#4F46E5' }}
       />
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div>
-            <button
+            <Button
+              variant="ghost"
               onClick={() => navigate('/dashboard')}
-              className="text-sm text-gray-400 hover:text-gray-600 mb-1"
+              className="text-sm text-gray-400 hover:text-gray-600 mb-1 transition-colors"
             >
               &larr; Dashboard
-            </button>
+            </Button>
             <h1 className="text-xl font-bold text-gray-900">{portal.name}</h1>
             <p className="text-sm text-gray-500">
               {portal.clientName} &middot; {portal.clientEmail}
@@ -111,17 +119,18 @@ export default function PortalView() {
         <div className="max-w-6xl mx-auto px-6">
           <nav className="flex space-x-1 -mb-px">
             {tabs.map((tab) => (
-              <button
+              <Button
                 key={tab.id}
+                variant="ghost"
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === tab.id
-                    ? 'border-blue-600 text-blue-600'
+                    ? 'border-indigo-600 text-indigo-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 {tab.label}
-              </button>
+              </Button>
             ))}
           </nav>
         </div>
@@ -155,7 +164,7 @@ export default function PortalView() {
   );
 }
 
-/* ─── Overview Tab ─── */
+/* --- Overview Tab --- */
 function OverviewTab({
   portal,
   tasks,
@@ -176,13 +185,13 @@ function OverviewTab({
     <div className="space-y-6">
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
+        <div className="bg-white rounded-xl border border-gray-200 border-l-4 border-l-indigo-500 p-5">
           <p className="text-sm text-gray-500">Files</p>
           <p className="text-2xl font-bold text-gray-900 mt-1">
             {files.length}
           </p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
+        <div className="bg-white rounded-xl border border-gray-200 border-l-4 border-l-emerald-500 p-5">
           <p className="text-sm text-gray-500">Tasks</p>
           <p className="text-2xl font-bold text-gray-900 mt-1">
             {tasks.filter((t) => t.status === 'done').length}/{tasks.length}
@@ -191,16 +200,16 @@ function OverviewTab({
             </span>
           </p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
+        <div className="bg-white rounded-xl border border-gray-200 border-l-4 border-l-violet-500 p-5">
           <p className="text-sm text-gray-500">Messages</p>
           <p className="text-2xl font-bold text-gray-900 mt-1">
             {messages.length}
           </p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
+        <div className="bg-white rounded-xl border border-gray-200 border-l-4 border-l-amber-500 p-5">
           <p className="text-sm text-gray-500">Outstanding</p>
           <p className="text-2xl font-bold text-gray-900 mt-1">
-            £{totalOwed.toFixed(2)}
+            {'\u00a3'}{totalOwed.toFixed(2)}
           </p>
         </div>
       </div>
@@ -222,7 +231,7 @@ function OverviewTab({
                       task.status === 'done'
                         ? 'bg-green-500'
                         : task.status === 'in_progress'
-                          ? 'bg-blue-500'
+                          ? 'bg-indigo-500'
                           : 'bg-gray-300'
                     }`}
                   />
@@ -269,7 +278,7 @@ function OverviewTab({
   );
 }
 
-/* ─── Files Tab ─── */
+/* --- Files Tab --- */
 function FilesTab({
   portalId,
   files,
@@ -311,12 +320,11 @@ function FilesTab({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900">Files</h2>
-        <button
+        <Button
           onClick={() => setShowUpload(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
         >
           Upload File
-        </button>
+        </Button>
       </div>
 
       {showUpload && (
@@ -326,37 +334,33 @@ function FilesTab({
         >
           <h3 className="text-sm font-semibold">Upload File</h3>
           <div className="grid grid-cols-2 gap-4">
-            <input
+            <Input
               placeholder="File name"
               value={form.fileName}
               onChange={(e) => setForm({ ...form, fileName: e.target.value })}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
               required
             />
-            <input
+            <Input
               placeholder="File size (bytes)"
               type="number"
               value={form.fileSize}
               onChange={(e) =>
                 setForm({ ...form, fileSize: parseInt(e.target.value) || 0 })
               }
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
             />
           </div>
           <div className="flex gap-2">
-            <button
+            <Button
               type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
             >
               Upload
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              variant="secondary"
               onClick={() => setShowUpload(false)}
-              className="border border-gray-300 px-4 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       )}
@@ -381,7 +385,7 @@ function FilesTab({
           </thead>
           <tbody className="divide-y divide-gray-200">
             {files.map((file) => (
-              <tr key={file.id} className="hover:bg-gray-50">
+              <tr key={file.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 text-sm font-medium text-gray-900">
                   {file.fileName}
                 </td>
@@ -392,15 +396,16 @@ function FilesTab({
                   {new Date(file.uploadedAt).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 space-x-2">
-                  <button className="text-blue-600 hover:underline text-sm">
+                  <Button variant="ghost" className="text-indigo-600 hover:underline text-sm">
                     Download
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="ghost"
                     onClick={() => handleDelete(file.id!)}
                     className="text-red-600 hover:underline text-sm"
                   >
                     Delete
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -421,7 +426,7 @@ function FilesTab({
   );
 }
 
-/* ─── Tasks Tab (Kanban) ─── */
+/* --- Tasks Tab (Kanban) --- */
 function TasksTab({
   portalId,
   tasks,
@@ -459,10 +464,10 @@ function TasksTab({
     invalidate();
   };
 
-  const columns: { status: TaskItem['status']; label: string; color: string }[] = [
-    { status: 'todo', label: 'To Do', color: 'bg-gray-100' },
-    { status: 'in_progress', label: 'In Progress', color: 'bg-blue-50' },
-    { status: 'done', label: 'Done', color: 'bg-green-50' },
+  const columns: { status: TaskItem['status']; label: string; bgColor: string; headerColor: string }[] = [
+    { status: 'todo', label: 'To Do', bgColor: 'bg-gray-50', headerColor: 'text-gray-700' },
+    { status: 'in_progress', label: 'In Progress', bgColor: 'bg-indigo-50', headerColor: 'text-indigo-700' },
+    { status: 'done', label: 'Done', bgColor: 'bg-green-50', headerColor: 'text-green-700' },
   ];
 
   return (
@@ -473,25 +478,24 @@ function TasksTab({
 
       {/* Add task form */}
       <form onSubmit={handleAdd} className="flex gap-2">
-        <input
+        <Input
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
           placeholder="Add a new task..."
-          className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1"
         />
-        <button
+        <Button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
         >
           Add Task
-        </button>
+        </Button>
       </form>
 
       {/* Kanban columns */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {columns.map((col) => (
-          <div key={col.status} className={`${col.color} rounded-xl p-4`}>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center justify-between">
+          <div key={col.status} className={`${col.bgColor} rounded-xl p-4`}>
+            <h3 className={`text-sm font-semibold ${col.headerColor} mb-3 flex items-center justify-between`}>
               {col.label}
               <span className="text-xs font-normal bg-white rounded-full px-2 py-0.5 text-gray-500">
                 {tasks.filter((t) => t.status === col.status).length}
@@ -503,21 +507,22 @@ function TasksTab({
                 .map((task) => (
                   <div
                     key={task.id}
-                    className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm"
+                    className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2 flex-1">
-                        <button
+                        <Button
+                          variant="ghost"
                           onClick={() =>
                             handleStatusChange(
                               task,
                               task.status === 'done' ? 'todo' : 'done',
                             )
                           }
-                          className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors ${
+                          className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors p-0 ${
                             task.status === 'done'
                               ? 'border-green-500 bg-green-500'
-                              : 'border-gray-300 hover:border-blue-400'
+                              : 'border-gray-300 hover:border-indigo-400'
                           }`}
                         >
                           {task.status === 'done' && (
@@ -535,24 +540,28 @@ function TasksTab({
                               />
                             </svg>
                           )}
-                        </button>
+                        </Button>
                         <span
                           className={`text-sm ${task.status === 'done' ? 'line-through text-gray-400' : 'text-gray-800'}`}
                         >
                           {task.title}
                         </span>
                       </div>
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => handleDelete(task.id!)}
-                        className="text-gray-300 hover:text-red-500 text-xs"
+                        className="text-gray-300 hover:text-red-500 text-xs transition-colors"
                       >
                         &times;
-                      </button>
+                      </Button>
                     </div>
                     {task.status !== 'done' && (
                       <div className="mt-2 flex gap-1">
                         {col.status !== 'todo' && (
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() =>
                               handleStatusChange(
                                 task,
@@ -561,13 +570,15 @@ function TasksTab({
                                   : 'in_progress',
                               )
                             }
-                            className="text-xs text-gray-400 hover:text-gray-600"
+                            className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
                           >
                             &larr;
-                          </button>
+                          </Button>
                         )}
                         {col.status !== 'done' && (
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() =>
                               handleStatusChange(
                                 task,
@@ -576,10 +587,10 @@ function TasksTab({
                                   : 'done',
                               )
                             }
-                            className="text-xs text-gray-400 hover:text-gray-600"
+                            className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
                           >
                             &rarr;
-                          </button>
+                          </Button>
                         )}
                       </div>
                     )}
@@ -593,7 +604,7 @@ function TasksTab({
   );
 }
 
-/* ─── Messages Tab ─── */
+/* --- Messages Tab --- */
 function MessagesTab({
   portalId,
   messages,
@@ -601,6 +612,7 @@ function MessagesTab({
   portalId: string;
   messages: Message[];
 }) {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [newMessage, setNewMessage] = useState('');
 
@@ -609,7 +621,7 @@ function MessagesTab({
     if (!newMessage.trim()) return;
     await api.messages.create({
       body: newMessage.trim(),
-      senderName: 'Owner',
+      senderName: user?.name ?? 'Owner',
       senderRole: 'owner',
       portalId,
     });
@@ -621,7 +633,7 @@ function MessagesTab({
     <div className="space-y-4">
       <h2 className="text-lg font-semibold text-gray-900">Messages</h2>
 
-      <div className="bg-white rounded-xl border border-gray-200 flex flex-col" style={{ height: '500px' }}>
+      <div className="bg-white rounded-xl border border-gray-200 flex flex-col h-[min(500px,calc(100vh-16rem))]">
         {/* Message list */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {messages.length === 0 ? (
@@ -637,7 +649,7 @@ function MessagesTab({
                 <div
                   className={`max-w-md rounded-xl px-4 py-3 ${
                     msg.senderRole === 'owner'
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-indigo-600 text-white'
                       : 'bg-gray-100 text-gray-900'
                   }`}
                 >
@@ -659,25 +671,24 @@ function MessagesTab({
           onSubmit={handleSend}
           className="border-t border-gray-200 p-4 flex gap-2"
         >
-          <input
+          <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1"
           />
-          <button
+          <Button
             type="submit"
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
           >
             Send
-          </button>
+          </Button>
         </form>
       </div>
     </div>
   );
 }
 
-/* ─── Invoices Tab ─── */
+/* --- Invoices Tab --- */
 function InvoicesTab({
   portalId,
   invoices,
@@ -740,7 +751,9 @@ function InvoicesTab({
       case 'Paid':
         return 'bg-green-100 text-green-800';
       case 'Sent':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-indigo-100 text-indigo-800';
+      case 'Overdue':
+        return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -750,12 +763,11 @@ function InvoicesTab({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900">Invoices</h2>
-        <button
+        <Button
           onClick={() => setShowForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
         >
           New Invoice
-        </button>
+        </Button>
       </div>
 
       {showForm && (
@@ -765,40 +777,36 @@ function InvoicesTab({
         >
           <h3 className="text-sm font-semibold">New Invoice</h3>
           <div className="grid grid-cols-2 gap-4">
-            <input
+            <Input
               placeholder="Invoice Number (e.g. INV-0001)"
               value={form.invoiceNumber}
               onChange={(e) =>
                 setForm({ ...form, invoiceNumber: e.target.value })
               }
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
               required
             />
-            <input
+            <Input
               type="date"
               value={form.dueDate}
               onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
               required
             />
-            <input
+            <Input
               placeholder="Client Name"
               value={form.clientName}
               onChange={(e) => setForm({ ...form, clientName: e.target.value })}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
               required
             />
-            <input
+            <Input
               placeholder="Client Email"
               type="email"
               value={form.clientEmail}
               onChange={(e) =>
                 setForm({ ...form, clientEmail: e.target.value })
               }
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
               required
             />
-            <input
+            <Input
               placeholder="Tax Rate (%)"
               type="number"
               step="0.01"
@@ -806,48 +814,47 @@ function InvoicesTab({
               onChange={(e) =>
                 setForm({ ...form, taxRate: parseFloat(e.target.value) || 0 })
               }
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
             />
           </div>
-          <input
+          <Input
             placeholder="Notes"
             value={form.notes}
             onChange={(e) => setForm({ ...form, notes: e.target.value })}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full"
+            className="w-full"
           />
           <div>
             <div className="flex justify-between items-center mb-2">
               <h4 className="font-medium text-sm">Line Items</h4>
-              <button
-                type="button"
+              <Button
+                variant="ghost"
                 onClick={addLineItem}
-                className="text-blue-600 text-sm hover:underline"
+                className="text-indigo-600 text-sm hover:underline"
               >
                 + Add Item
-              </button>
+              </Button>
             </div>
             {form.lineItems.map((item, i) => (
               <div key={i} className="flex gap-2 mb-2">
-                <input
+                <Input
                   placeholder="Description"
                   value={item.description}
                   onChange={(e) =>
                     updateLineItem(i, 'description', e.target.value)
                   }
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm flex-1"
+                  className="flex-1"
                   required
                 />
-                <input
+                <Input
                   placeholder="Qty"
                   type="number"
                   value={item.quantity}
                   onChange={(e) =>
                     updateLineItem(i, 'quantity', parseInt(e.target.value) || 0)
                   }
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-20"
+                  className="w-20"
                   required
                 />
-                <input
+                <Input
                   placeholder="Unit Price"
                   type="number"
                   step="0.01"
@@ -859,12 +866,12 @@ function InvoicesTab({
                       parseFloat(e.target.value) || 0,
                     )
                   }
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-32"
+                  className="w-32"
                   required
                 />
                 {form.lineItems.length > 1 && (
-                  <button
-                    type="button"
+                  <Button
+                    variant="ghost"
                     onClick={() =>
                       setForm({
                         ...form,
@@ -876,25 +883,23 @@ function InvoicesTab({
                     className="text-red-500 hover:text-red-700 px-2"
                   >
                     X
-                  </button>
+                  </Button>
                 )}
               </div>
             ))}
           </div>
           <div className="flex gap-2">
-            <button
+            <Button
               type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
             >
               Create Invoice
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              variant="secondary"
               onClick={resetForm}
-              className="border border-gray-300 px-4 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       )}
@@ -922,7 +927,7 @@ function InvoicesTab({
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-lg font-bold text-gray-900">
-                    £{inv.total.toFixed(2)}
+                    {'\u00a3'}{inv.total.toFixed(2)}
                   </span>
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${statusColor(inv.status)}`}
@@ -930,9 +935,12 @@ function InvoicesTab({
                     {inv.status}
                   </span>
                   {inv.status === 'Sent' && (
-                    <button className="bg-green-600 text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-green-700">
+                    <Button
+                      className="bg-green-600 text-white hover:bg-green-700 px-3 py-1 text-xs"
+                      size="sm"
+                    >
                       Pay Now
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
@@ -953,10 +961,10 @@ function InvoicesTab({
                           <td className="py-1">{li.description}</td>
                           <td className="text-right py-1">{li.quantity}</td>
                           <td className="text-right py-1">
-                            £{li.unitPrice.toFixed(2)}
+                            {'\u00a3'}{li.unitPrice.toFixed(2)}
                           </td>
                           <td className="text-right py-1">
-                            £{li.amount.toFixed(2)}
+                            {'\u00a3'}{li.amount.toFixed(2)}
                           </td>
                         </tr>
                       ))}
@@ -967,7 +975,7 @@ function InvoicesTab({
                           Subtotal
                         </td>
                         <td className="text-right py-1">
-                          £{inv.subtotal.toFixed(2)}
+                          {'\u00a3'}{inv.subtotal.toFixed(2)}
                         </td>
                       </tr>
                       {inv.taxAmount > 0 && (
@@ -976,7 +984,7 @@ function InvoicesTab({
                             Tax ({inv.taxRate}%)
                           </td>
                           <td className="text-right py-1">
-                            £{inv.taxAmount.toFixed(2)}
+                            {'\u00a3'}{inv.taxAmount.toFixed(2)}
                           </td>
                         </tr>
                       )}
@@ -985,7 +993,7 @@ function InvoicesTab({
                           Total
                         </td>
                         <td className="text-right py-1">
-                          £{inv.total.toFixed(2)}
+                          {'\u00a3'}{inv.total.toFixed(2)}
                         </td>
                       </tr>
                     </tfoot>

@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { Portal, Invoice } from '../../../types';
 import { api } from '../../../api';
 import Button from '../../../components/Button/Button';
+import Input from '../../../components/Input/Input';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ export default function Dashboard() {
     name: '',
     clientName: '',
     clientEmail: '',
-    brandColor: '#3B82F6',
+    brandColor: '#4F46E5',
   });
 
   const activePortals = portals.filter((p) => p.status === 'Active');
@@ -32,6 +32,13 @@ export default function Dashboard() {
     })
     .reduce((sum, i) => sum + i.total, 0);
 
+  const statColors = [
+    'border-l-indigo-500',
+    'border-l-emerald-500',
+    'border-l-amber-500',
+    'border-l-violet-500',
+  ];
+
   const stats = [
     { label: 'Active Portals', value: activePortals.length },
     {
@@ -39,7 +46,7 @@ export default function Dashboard() {
       value: new Set(portals.map((p) => p.clientEmail)).size,
     },
     { label: 'Unpaid Invoices', value: unpaidInvoices.length },
-    { label: 'Revenue This Month', value: `£${revenueThisMonth.toFixed(2)}` },
+    { label: 'Revenue This Month', value: `\u00a3${revenueThisMonth.toFixed(2)}` },
   ];
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -58,7 +65,7 @@ export default function Dashboard() {
       name: '',
       clientName: '',
       clientEmail: '',
-      brandColor: '#3B82F6',
+      brandColor: '#4F46E5',
     });
     setShowCreateForm(false);
     queryClient.invalidateQueries({ queryKey: ['portals'] });
@@ -78,10 +85,10 @@ export default function Dashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => (
+        {stats.map((stat, i) => (
           <div
             key={stat.label}
-            className="bg-white rounded-xl border border-gray-200 p-6"
+            className={`bg-white rounded-xl border border-gray-200 border-l-4 ${statColors[i]} p-6`}
           >
             <p className="text-sm font-medium text-gray-500">{stat.label}</p>
             <p className="text-3xl font-bold text-gray-900 mt-2">
@@ -98,48 +105,39 @@ export default function Dashboard() {
             Create New Portal
           </h3>
           <form onSubmit={handleCreate} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Portal Name
-                </label>
-                <input
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="e.g. Acme Corp Website"
-                  required
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Client Name
-                </label>
-                <input
-                  value={form.clientName}
-                  onChange={(e) =>
-                    setForm({ ...form, clientName: e.target.value })
-                  }
-                  placeholder="Jane Doe"
-                  required
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Client Email
-                </label>
-                <input
-                  type="email"
-                  value={form.clientEmail}
-                  onChange={(e) =>
-                    setForm({ ...form, clientEmail: e.target.value })
-                  }
-                  placeholder="client@example.com"
-                  required
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                id="portal-name"
+                label="Portal Name"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="e.g. Acme Corp Website"
+                required
+                className="w-full"
+              />
+              <Input
+                id="portal-client-name"
+                label="Client Name"
+                value={form.clientName}
+                onChange={(e) =>
+                  setForm({ ...form, clientName: e.target.value })
+                }
+                placeholder="Jane Doe"
+                required
+                className="w-full"
+              />
+              <Input
+                id="portal-client-email"
+                label="Client Email"
+                type="email"
+                value={form.clientEmail}
+                onChange={(e) =>
+                  setForm({ ...form, clientEmail: e.target.value })
+                }
+                placeholder="client@example.com"
+                required
+                className="w-full"
+              />
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Brand Color
@@ -153,12 +151,12 @@ export default function Dashboard() {
                     }
                     className="w-10 h-10 rounded border border-gray-300 cursor-pointer"
                   />
-                  <input
+                  <Input
                     value={form.brandColor}
                     onChange={(e) =>
                       setForm({ ...form, brandColor: e.target.value })
                     }
-                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                    className="flex-1"
                   />
                 </div>
               </div>
@@ -192,16 +190,16 @@ export default function Dashboard() {
                 (i) => i.status !== 'Paid',
               ).length;
               return (
-                <div
+                <Link
                   key={portal.id}
-                  onClick={() => navigate(`/p/${portal.slug}`)}
-                  className="bg-white rounded-xl border border-gray-200 p-6 cursor-pointer hover:shadow-md transition-shadow"
+                  to={`/p/${portal.slug}`}
+                  className="block bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-all hover:border-gray-300"
                 >
                   <div className="flex items-start justify-between">
                     <div
                       className="w-3 h-3 rounded-full mt-1"
                       style={{
-                        backgroundColor: portal.brandColor || '#3B82F6',
+                        backgroundColor: portal.brandColor || '#4F46E5',
                       }}
                     />
                     <span
@@ -232,7 +230,7 @@ export default function Dashboard() {
                       </span>
                     )}
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>

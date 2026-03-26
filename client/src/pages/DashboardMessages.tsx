@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api';
-import type { Portal, Message } from '../types';
+import type { Message } from '../types';
 
 export default function DashboardMessages() {
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ export default function DashboardMessages() {
               <div
                 key={portal.id}
                 onClick={() => navigate(`/p/${portal.slug}`)}
-                className="bg-white rounded-xl border border-gray-200 p-5 cursor-pointer hover:shadow-md transition-shadow flex items-center justify-between"
+                className="bg-white rounded-xl border border-gray-200 p-5 cursor-pointer hover:shadow-md transition-all hover:border-gray-300 flex items-center justify-between"
               >
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900">
@@ -72,7 +72,7 @@ export default function DashboardMessages() {
                     </p>
                   )}
                   {messages.length > 0 && (
-                    <span className="inline-block mt-1 bg-blue-100 text-blue-700 text-xs font-medium px-2 py-0.5 rounded-full">
+                    <span className="inline-block mt-1 bg-indigo-100 text-indigo-700 text-xs font-medium px-2 py-0.5 rounded-full">
                       {messages.length}
                     </span>
                   )}

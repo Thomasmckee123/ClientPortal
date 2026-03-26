@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+:root {
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --color-primary: #4F46E5;
+  --color-primary-light: #EEF2FF;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F9FAFB;
+  --color-border-secondary: #D1D5DB;
+  --color-border-tertiary: #E5E7EB;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}

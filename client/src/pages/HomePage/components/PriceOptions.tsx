@@ -1,20 +1,21 @@
 import { useNavigate } from 'react-router-dom';
+import Button from '../../../components/Button/Button';
 
 const priceOptionsData = [
   {
     title: 'Free',
-    price: '£0',
+    price: '\u00a30',
     features: ['1 client portal', 'File sharing', 'Basic Messaging'],
   },
   {
     title: 'Pro',
-    price: '£12',
+    price: '\u00a312',
     features: ['Unlimited Portals', 'Custom Branding', 'Invoicing + Stripe'],
     popular: true,
   },
   {
     title: 'Agency',
-    price: '£29',
+    price: '\u00a329',
     features: ['Everything in Pro', 'Team Members', 'Priority Support'],
   },
 ];
@@ -34,14 +35,14 @@ const PriceOptions = () => {
         {priceOptionsData.map((option) => (
           <div
             key={option.title}
-            className={`flex flex-col items-start p-6 rounded-xl border-2 ${
+            className={`flex flex-col items-start p-6 rounded-xl border-2 bg-white ${
               option.popular
-                ? 'border-blue-500 relative'
+                ? 'border-indigo-500 relative shadow-md'
                 : 'border-gray-200'
             }`}
           >
             {option.popular && (
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-medium px-3 py-1 rounded-full">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs font-medium px-3 py-1 rounded-full">
                 Popular
               </span>
             )}
@@ -75,16 +76,13 @@ const PriceOptions = () => {
                 </li>
               ))}
             </ul>
-            <button
+            <Button
+              variant={option.popular ? 'primary' : 'secondary'}
               onClick={() => navigate('/signup')}
-              className={`mt-6 w-full py-2 rounded-lg text-sm font-medium transition-colors ${
-                option.popular
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              className="mt-6 w-full py-2"
             >
               Get Started
-            </button>
+            </Button>
           </div>
         ))}
       </div>

@@ -1,9 +1,10 @@
 import { cn } from '../../lib/utils';
 
 const variantStyles = {
-  primary: 'bg-blue-600 text-white hover:bg-blue-700',
+  primary: 'bg-indigo-600 text-white hover:bg-indigo-700',
   danger: 'bg-red-600 text-white hover:bg-red-700',
   secondary: 'border border-gray-300 text-gray-700 hover:bg-gray-50',
+  ghost: 'text-gray-600 hover:text-gray-900',
 };
 
 const sizeStyles = {
@@ -18,6 +19,7 @@ const Button = ({
   type = 'button',
   variant = 'primary',
   size = 'md',
+  disabled,
   className,
 }: {
   children?: React.ReactNode;
@@ -26,16 +28,19 @@ const Button = ({
   type?: 'button' | 'submit';
   variant?: keyof typeof variantStyles;
   size?: keyof typeof sizeStyles;
+  disabled?: boolean;
   className?: string;
 }) => {
   return (
     <button
       type={type}
       onClick={onClick}
+      disabled={disabled}
       className={cn(
         'font-medium transition-colors cursor-pointer',
         variantStyles[variant],
-        sizeStyles[size],
+        variant !== 'ghost' && sizeStyles[size],
+        disabled && 'opacity-60 cursor-not-allowed',
         className,
       )}
     >

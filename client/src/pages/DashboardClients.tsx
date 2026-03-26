@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api';
 import type { Portal } from '../types';
+import Button from '../components/Button/Button';
 
 export default function DashboardClients() {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ export default function DashboardClients() {
           </thead>
           <tbody className="divide-y divide-gray-200">
             {clients.map((client) => (
-              <tr key={client.email} className="hover:bg-gray-50">
+              <tr key={client.email} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 text-sm font-medium text-gray-900">
                   {client.name}
                 </td>
@@ -61,7 +62,7 @@ export default function DashboardClients() {
                     {client.portals.map((p) => (
                       <span
                         key={p.id}
-                        className="inline-block bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded-full"
+                        className="inline-block bg-indigo-50 text-indigo-700 text-xs px-2 py-0.5 rounded-full"
                       >
                         {p.name}
                       </span>
@@ -69,12 +70,9 @@ export default function DashboardClients() {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <button
-                    onClick={() => navigate(`/p/${client.portals[0].slug}`)}
-                    className="text-blue-600 hover:underline text-sm"
-                  >
+                  <Button variant="ghost" className="text-indigo-600" onClick={() => navigate(`/p/${client.portals[0].slug}`)}>
                     View Portal
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ))}
