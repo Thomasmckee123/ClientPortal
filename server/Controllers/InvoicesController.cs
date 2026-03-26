@@ -1,10 +1,12 @@
 using ClientPortal.API.DTOs;
 using ClientPortal.API.Models;
 using ClientPortal.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClientPortal.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class InvoicesController : ControllerBase
@@ -27,6 +29,10 @@ public class InvoicesController : ControllerBase
         return invoice is null ? NotFound() : Ok(invoice);
     }
 
+    [HttpGet("portal/{portalId}")]
+    public async Task<ActionResult<List<Invoice>>> GetByPortalId(string portalId) =>
+        Ok(await _invoiceService.GetByPortalIdAsync(portalId));
+
     [HttpPost]
     public async Task<ActionResult<Invoice>> Create(CreateInvoiceDto dto)
     {
@@ -38,6 +44,7 @@ public class InvoicesController : ControllerBase
             ClientEmail = dto.ClientEmail,
             TaxRate = dto.TaxRate,
             Notes = dto.Notes,
+            PortalId = dto.PortalId,
             LineItems = dto.LineItems.Select(li => new LineItem
             {
                 Description = li.Description,

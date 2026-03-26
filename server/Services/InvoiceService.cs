@@ -19,6 +19,9 @@ public class InvoiceService
     public async Task<Invoice?> GetByIdAsync(string id) =>
         await _invoices.Find(i => i.Id == id).FirstOrDefaultAsync();
 
+    public async Task<List<Invoice>> GetByPortalIdAsync(string portalId) =>
+        await _invoices.Find(i => i.PortalId == portalId).SortByDescending(i => i.CreatedDate).ToListAsync();
+
     public async Task<Invoice> CreateAsync(Invoice invoice)
     {
         await _invoices.InsertOneAsync(invoice);
