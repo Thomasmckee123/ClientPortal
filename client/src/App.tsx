@@ -10,6 +10,7 @@ import DashboardBilling from './pages/DashboardBilling';
 import DashboardSettings from './pages/DashboardSettings';
 import PortalView from './pages/PortalView';
 import Dashboard from './pages/Dashboard/components/Dashboard';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -17,7 +18,14 @@ function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/dashboard" element={<DashboardLayout />}>
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }
+      >
         <Route index element={<Dashboard />} />
         <Route path="invoices" element={<DashboardInvoices />} />
         <Route path="messages" element={<DashboardMessages />} />
