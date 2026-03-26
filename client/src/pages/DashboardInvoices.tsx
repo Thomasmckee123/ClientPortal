@@ -118,7 +118,7 @@ export default function DashboardInvoices() {
       case 'Paid':
         return 'bg-green-100 text-green-800';
       case 'Sent':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-indigo-100 text-indigo-800';
       case 'Overdue':
         return 'bg-red-100 text-red-800';
       default:
@@ -130,15 +130,12 @@ export default function DashboardInvoices() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Invoices</h1>
-        <button
-          onClick={() => {
+        <Button onClick={() => {
             resetForm();
             setShowForm(true);
-          }}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
-        >
+          }}>
           New Invoice
-        </button>
+        </Button>
       </div>
 
       {showForm && (
@@ -205,13 +202,9 @@ export default function DashboardInvoices() {
           <div>
             <div className="flex justify-between items-center mb-2">
               <h4 className="font-medium text-sm">Line Items</h4>
-              <button
-                type="button"
-                onClick={addLineItem}
-                className="text-blue-600 text-sm hover:underline"
-              >
+              <Button variant="ghost" className="text-indigo-600 text-sm" onClick={addLineItem}>
                 + Add Item
-              </button>
+              </Button>
             </div>
             {form.lineItems.map((item, i) => (
               <div key={i} className="flex gap-2 mb-2">
@@ -250,13 +243,9 @@ export default function DashboardInvoices() {
                   required
                 />
                 {form.lineItems.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeLineItem(i)}
-                    className="text-red-500 hover:text-red-700 px-2"
-                  >
+                  <Button variant="ghost" className="text-red-500 hover:text-red-700 px-2" onClick={() => removeLineItem(i)}>
                     X
-                  </button>
+                  </Button>
                 )}
               </div>
             ))}
@@ -272,35 +261,28 @@ export default function DashboardInvoices() {
               <div className="bg-gray-50 rounded-lg p-4 space-y-1 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
-                  <span>£{subtotal.toFixed(2)}</span>
+                  <span>{'\u00a3'}{subtotal.toFixed(2)}</span>
                 </div>
                 {form.taxRate > 0 && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Tax ({form.taxRate}%)</span>
-                    <span>£{taxAmount.toFixed(2)}</span>
+                    <span>{'\u00a3'}{taxAmount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between font-semibold text-base border-t pt-2 mt-2">
                   <span>Total</span>
-                  <span>£{total.toFixed(2)}</span>
+                  <span>{'\u00a3'}{total.toFixed(2)}</span>
                 </div>
               </div>
             );
           })()}
           <div className="flex gap-2">
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
-            >
+            <Button type="submit">
               {editing ? 'Update' : 'Create'}
-            </button>
-            <button
-              type="button"
-              onClick={resetForm}
-              className="border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
+            </Button>
+            <Button variant="secondary" onClick={resetForm}>
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       )}
@@ -312,7 +294,7 @@ export default function DashboardInvoices() {
           { header: 'Invoice #', accessor: 'invoiceNumber', className: 'font-medium text-gray-900' },
           { header: 'Client', accessor: 'clientName' },
           { header: 'Due Date', render: (inv) => new Date(inv.dueDate).toLocaleDateString() },
-          { header: 'Total', render: (inv) => `£${inv.total.toFixed(2)}`, className: 'font-semibold text-gray-900' },
+          { header: 'Total', render: (inv) => `\u00a3${inv.total.toFixed(2)}`, className: 'font-semibold text-gray-900' },
           {
             header: 'Status',
             render: (inv) => (
@@ -325,7 +307,7 @@ export default function DashboardInvoices() {
             header: 'Actions',
             render: (inv) => (
               <div className="space-x-2">
-                <Button onClick={() => handleEdit(inv)} className="text-blue-600 hover:underline text-sm">Edit</Button>
+                <Button onClick={() => handleEdit(inv)} className="text-indigo-600 hover:underline text-sm">Edit</Button>
                 <Button onClick={() => handleDelete(inv.id!)} className="text-red-600 hover:underline text-sm">Delete</Button>
               </div>
             ),

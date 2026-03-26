@@ -1,16 +1,17 @@
 import { useState } from 'react';
+import Button from '../components/Button/Button';
 
 const plans = [
   {
     name: 'Free',
-    price: '£0',
+    price: '\u00a30',
     period: '/mo',
     features: ['1 client portal', 'File sharing', 'Basic messaging'],
     current: true,
   },
   {
     name: 'Pro',
-    price: '£12',
+    price: '\u00a312',
     period: '/mo',
     features: [
       'Unlimited portals',
@@ -23,7 +24,7 @@ const plans = [
   },
   {
     name: 'Agency',
-    price: '£29',
+    price: '\u00a329',
     period: '/mo',
     features: [
       'Everything in Pro',
@@ -65,14 +66,14 @@ export default function DashboardBilling() {
         {plans.map((plan) => (
           <div
             key={plan.name}
-            className={`bg-white rounded-xl border-2 p-6 relative ${
+            className={`bg-white rounded-xl border-2 p-6 relative transition-shadow ${
               currentPlan === plan.name
-                ? 'border-blue-500'
+                ? 'border-indigo-500 shadow-md'
                 : 'border-gray-200'
             }`}
           >
             {plan.popular && (
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-medium px-3 py-1 rounded-full">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs font-medium px-3 py-1 rounded-full">
                 Popular
               </span>
             )}
@@ -105,17 +106,17 @@ export default function DashboardBilling() {
                 </li>
               ))}
             </ul>
-            <button
+            <Button
               onClick={() => setCurrentPlan(plan.name)}
-              className={`mt-6 w-full py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`mt-6 w-full ${
                 currentPlan === plan.name
                   ? 'bg-gray-100 text-gray-500 cursor-default'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
+                  : ''
               }`}
               disabled={currentPlan === plan.name}
             >
               {currentPlan === plan.name ? 'Current Plan' : 'Upgrade'}
-            </button>
+            </Button>
           </div>
         ))}
       </div>
@@ -127,9 +128,9 @@ export default function DashboardBilling() {
         </h2>
         <p className="text-sm text-gray-500">
           No payment method on file.{' '}
-          <button className="text-blue-600 hover:underline">
+          <Button variant="ghost" className="text-indigo-600">
             Add a payment method
-          </button>{' '}
+          </Button>{' '}
           to upgrade your plan.
         </p>
       </div>
