@@ -1,10 +1,12 @@
 using ClientPortal.API.DTOs;
 using ClientPortal.API.Models;
 using ClientPortal.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClientPortal.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class FilesController : ControllerBase

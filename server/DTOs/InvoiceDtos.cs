@@ -9,6 +9,7 @@ public class CreateInvoiceDto
     public List<CreateLineItemDto> LineItems { get; set; } = new();
     public decimal TaxRate { get; set; }
     public string? Notes { get; set; }
+    public string? PortalId { get; set; }
 }
 
 public class UpdateInvoiceDto

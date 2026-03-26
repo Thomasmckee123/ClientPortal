@@ -25,6 +25,9 @@ public class Invoice
 
     public string Status { get; set; } = "Draft";
     public string? Notes { get; set; }
+
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string? PortalId { get; set; }
 }
 
 public class LineItem
