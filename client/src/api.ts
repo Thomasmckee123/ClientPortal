@@ -3,16 +3,43 @@ import type { Portal, TaskItem, Message, FileRecord, Invoice } from './types';
 const BASE = '/api';
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
+  const token = localStorage.getItem('auth_token');
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${BASE}${url}`, {
-    headers: { 'Content-Type': 'application/json' },
     ...options,
+    headers: { ...headers, ...(options?.headers as Record<string, string>) },
   });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    const message = body?.message || body?.error || `${res.status} ${res.statusText}`;
+    throw new Error(message);
+  }
+
   if (res.status === 204) return undefined as T;
   return res.json();
 }
 
 export const api = {
+  auth: {
+    login: (email: string, password: string) =>
+      request<{ token: string; user: { id: string; name: string; email: string } }>(
+        '/auth/login',
+        { method: 'POST', body: JSON.stringify({ email, password }) },
+      ),
+    register: (name: string, email: string, password: string) =>
+      request<{ token: string; user: { id: string; name: string; email: string } }>(
+        '/auth/register',
+        { method: 'POST', body: JSON.stringify({ name, email, password }) },
+      ),
+    me: () => request<{ id: string; name: string; email: string }>('/auth/me'),
+  },
   invoices: {
     getAll: () => request<Invoice[]>('/invoices'),
     getById: (id: string) => request<Invoice>(`/invoices/${id}`),
